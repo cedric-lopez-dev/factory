@@ -7,7 +7,7 @@ chmod +x install.sh
 ```
 
 ```bash
-./install.sh
+sudo ./install.sh
 ```
 
 ## Run Traefik
@@ -24,6 +24,8 @@ factory run traefik
 > The API requires Node.js and the dashboard require the API. If you do not wish to use Node.js, only the CLI will be available.
 
 ## API Prerequisites
+
+### For linux
 
 ```bash
 sudo apt update && sudo apt install nodejs npm lsof
