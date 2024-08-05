@@ -1,0 +1,109 @@
+{
+    "elements": {
+        "extensions": [
+            {
+                "name": "website",
+                "enabled": true
+            },
+            {
+                "name": "test",
+                "enabled": false
+            },
+            {
+                "name": "annuaire",
+                "enabled": true,
+                "config": {
+                    "item": {
+                        "entity": "job",
+                        "mapping": {
+                            "name": "Title"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "blog",
+                "enabled": true
+            },
+            {
+                "name": "immo",
+                "enabled": true
+            }
+        ]
+    },
+    "template": {
+        "/": {
+            "extension": "website",
+            "page": "home",
+            "sections": [
+                {
+                    "extension": "website",
+                    "name": "hero"
+                },
+                {
+                    "extension": "immo",
+                    "name": "best"
+                }
+            ],
+            "metadata": {
+                "title": "home"
+            },
+            "layout": [
+                {
+                    "extension": "website",
+                    "name": "main"
+                }
+            ],
+            "entities": [
+                "job"
+            ]
+        },
+        "contact": {
+            "extension": "website",
+            "page": "home",
+            "sections": [
+                {
+                    "extension": "website",
+                    "name": "hero"
+                },
+                {
+                    "extension": "immo",
+                    "name": "best"
+                }
+            ],
+            "metadata": {
+                "title": "home"
+            },
+            "entities": [
+                "job"
+            ]
+        },
+        "annuaire": {
+            "extension": "annuaire",
+            "page": "annuaire",
+            "ok": {
+                "extension": "website",
+                "page": "home",
+                "metadata": {
+                    "title": "ok {{name}} et {{city}}"
+                },
+                "layout": [
+                    {
+                        "extension": "website",
+                        "name": "main"
+                    }
+                ]
+            },
+            "metadata": {
+                "title": "annuaire"
+            }
+        },
+        "blog": {
+            "extension": "blog",
+            "page": "home"
+        }
+    },
+    "entities": {
+        "job": "http://data-job-api:3000/api/job"
+    }
+}

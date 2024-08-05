@@ -18,7 +18,7 @@ TEMPLATE_DIR="/usr/local/share/factory/templates"
 
 for dir in "$TEMPLATE_DIR"/*/; do
 
-    echo "- ${PURPLE}$(basename "$dir")${reset}"
+    echo "- ${PURPLE}$(basename "$dir")${RESET}"
 
 done
 
