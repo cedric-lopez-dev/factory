@@ -1,0 +1,47 @@
+#!/bin/bash
+
+command="$1"
+shift
+
+case "$command" in
+    "run")
+        run_command="$1"
+        shift
+        case "$run_command" in
+            "traefik")
+                /usr/local/bin/factory-scripts/traefik.sh "$@"
+                ;;
+            "api")
+                /usr/local/bin/factory-scripts/factory-api.sh "$@"
+                ;;
+            "dashboard")
+                /usr/local/bin/factory-scripts/factory-api.sh "$@"
+                /usr/local/bin/factory-scripts/factory-dashboard.sh "$@"
+                ;;
+            *)
+                echo "Unknown sub-command for 'factory run': $run_command"
+                exit 1
+                ;;
+        esac
+        ;;
+    "init")
+        /usr/local/bin/factory-scripts/init.sh "$@"
+        exit 0
+        ;;
+    "--help")
+        /usr/local/bin/factory-scripts/help.sh
+        exit 0
+        ;;
+    "--templates")
+        /usr/local/bin/factory-scripts/template-listing.sh
+        exit 0
+        ;;                
+
+    *)
+        echo "Unknown command for 'factory': $command"
+        echo "Use ${GREEN}${CLI_NAME} ${YELLOW}--help${RESET} to see available commands.${RESET}"
+        exit 1
+        ;;
+esac
+
+exit 0

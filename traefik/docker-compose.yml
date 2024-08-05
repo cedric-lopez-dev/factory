@@ -1,0 +1,62 @@
+networks:
+  # Allow the use of traefik in other docker-compose.yml files
+  traefik:
+    external: true
+
+services:
+  traefik-nossl:
+    profiles: [ "nossl" ]
+    image: "traefik:v2.2"
+    container_name: "traefik"
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    networks:
+      - "traefik"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  traefik:
+    profiles: [ "ssl" ]
+    image: "traefik:v2.2"
+    container_name: "traefik"
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myhttpchallenge.acme.httpchallenge=true"
+      - "--certificatesresolvers.myhttpchallenge.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myhttpchallenge.acme.email=${EMAIL}"
+      - "--certificatesresolvers.myhttpchallenge.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    networks:
+      - "traefik"
+    volumes:
+      - "traefik_letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./http-config.yml:/etc/traefik/http-config.yml"
+
+volumes:
+  traefik_letsencrypt:

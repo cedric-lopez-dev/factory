@@ -1,0 +1,43 @@
+networks:
+  traefik:
+    external: true
+
+services:
+  next-nossl:
+    profiles: [ "nossl" ]
+    image: node:alpine
+    container_name: "${WEBSITE_NAME}"
+    restart: always
+    volumes:
+      - .:/app
+    working_dir: /app/next
+    command: /bin/sh -c "npm install && npm run build && npm start"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${WEBSITE_NAME}.rule=PathPrefix(`/factory`)"
+      - "traefik.http.routers.${WEBSITE_NAME}.entrypoints=${ENTRYPOINT}"
+      - "traefik.http.services.${WEBSITE_NAME}.loadbalancer.server.port=3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - traefik
+
+  next:
+    profiles: [ "ssl" ]
+    image: node:alpine
+    container_name: "${WEBSITE_NAME}"
+    restart: always
+    volumes:
+      - .:/app
+    working_dir: /app/next
+    command: /bin/sh -c "npm install && npm run dev"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${WEBSITE_NAME}.rule=Host(`localhost`) && PathPrefix(`/factory`)"
+      - "traefik.http.routers.${WEBSITE_NAME}.entrypoints=${ENTRYPOINT}"
+      - "traefik.http.services.${WEBSITE_NAME}.loadbalancer.server.port=3000"
+      - "traefik.http.routers.${WEBSITE_NAME}.tls.certresolver=myhttpchallenge"
+    networks:
+      - traefik
+volumes:
+  factoryDasboard:
