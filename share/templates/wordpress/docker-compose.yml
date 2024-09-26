@@ -1,0 +1,53 @@
+networks:
+  traefik:
+    external: true
+
+services:
+  wordpress:
+    image: wordpress
+    container_name: "${WEBSITE_NAME}"
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: root
+      WORDPRESS_DB_NAME: wordpress_db
+    volumes:
+      - ./wordpress:/var/www/html
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${WEBSITE_NAME}.entrypoints=${ENTRYPOINT}"
+      - "traefik.http.routers.${WEBSITE_NAME}.rule=Host(`${DOMAIN_WEBSITE}`)"
+    networks:
+      - traefik
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb
+    container_name: "mariadb${WEBSITE_NAME}"
+    environment:
+      MYSQL_DATABASE: wordpress_db
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - traefik
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: "phpmyadmin${WEBSITE_NAME}"
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: root
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin${WEBSITE_NAME}.entrypoints=web"
+      - "traefik.http.routers.phpmyadmin${WEBSITE_NAME}.rule=Host(`php.${DOMAIN_WEBSITE}`)"
+    networks:
+      - traefik
+    depends_on:
+      - mariadb
+
+volumes:
+  db:
