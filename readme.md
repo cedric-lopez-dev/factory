@@ -1,3 +1,7 @@
+# Factory
+
+`Factory` is a project initialization tool that uses templates in a Docker environment with Traefik. It allows for quick project setup and ensures efficient application deployment.
+
 # Get Started
 
 ## Install
