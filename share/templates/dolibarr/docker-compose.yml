@@ -1,0 +1,54 @@
+networks:
+  traefik:
+    external: true
+
+services:
+  dolibarr-nossl:
+    profiles: [ "nossl" ]
+    image: tuxgasy/dolibarr
+    container_name: "${WEBSITE_NAME}"
+    environment:
+      DOLI_DB_HOST: mariadb${WEBSITE_NAME}
+      DOLI_DB_USER: root
+      DOLI_DB_PASSWORD: root
+      DOLI_ADMIN_LOGIN: admin
+      DOLI_ADMIN_PASSWORD: Marie66240
+      DOLI_DB_NAME: dolibarr
+      DOLI_URL_ROOT: 'http://0.0.0.0'
+      PHP_INI_DATE_TIMEZONE: 'Europe/Paris'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${WEBSITE_NAME}.entrypoints=${ENTRYPOINT}"
+      - "traefik.http.routers.${WEBSITE_NAME}.rule=Host(`${DOMAIN_WEBSITE}`)"
+    networks:
+      - traefik
+
+  dolibarr:
+    profiles: [ "ssl" ]
+    image: tuxgasy/dolibarr
+    container_name: "${WEBSITE_NAME}"
+    environment:
+      DOLI_DB_HOST: mariadb${WEBSITE_NAME}
+      DOLI_DB_USER: root
+      DOLI_DB_PASSWORD: root
+      DOLI_ADMIN_LOGIN: admin
+      DOLI_ADMIN_PASSWORD: "${PASSWORD}"
+      DOLI_DB_NAME: dolibarr
+      DOLI_URL_ROOT: 'http://0.0.0.0'
+      PHP_INI_DATE_TIMEZONE: 'Europe/Paris'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${WEBSITE_NAME}.entrypoints=${ENTRYPOINT}"
+      - "traefik.http.routers.${WEBSITE_NAME}.rule=Host(`${DOMAIN_WEBSITE}`)"
+      - "traefik.http.routers.${WEBSITE_NAME}.tls.certresolver=myhttpchallenge"
+    networks:
+      - traefik
+
+  mariadb:
+    container_name: "mariadb${WEBSITE_NAME}"
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dolibarr
+    networks:
+      - traefik
